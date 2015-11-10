@@ -40,4 +40,4 @@ for url in urls:
 df.columns = ["Company", "ParagraphText"]
 
 #print to csv
-#DF.to_csv("TermsOfService.csv", index=False)
+#df.to_csv("TermsOfService.csv", index=False)
