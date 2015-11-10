@@ -38,3 +38,6 @@ for url in urls:
 
 #rename columns
 df.columns = ["Company", "ParagraphText"]
+
+#print to csv
+#DF.to_csv("TermsOfService.csv", index=False)
