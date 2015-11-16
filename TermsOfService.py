@@ -41,7 +41,8 @@ for url in urls:
     
     for paragraph in para:
         paraText = paragraph.get_text()
-        rowValue = pd.Series([companies[index], paraText])
+        paraText = paraText.strip()
+        rowValue = pd.Series([companies[index], paraText, len(paraText), int(paraText.count(' '))])
         df = df.append(rowValue, ignore_index=True)
 
 for url in urls2:
@@ -54,7 +55,8 @@ for url in urls2:
     for paragraph in paraTitle:
         para = str(paragraph.nextSibling.nextSibling)
         paraText = BeautifulSoup(para).get_text()
-        rowValue = pd.Series([companies2[index], paraText])
+        paraText = paraText.strip()
+        rowValue = pd.Series([companies2[index], paraText, len(paraText), paraText.count(' ')])
         df = df.append(rowValue, ignore_index=True)
         
 for url in urls3:
@@ -66,14 +68,12 @@ for url in urls3:
     
     for paragraph in para:
         paraText = paragraph.get_text()
-        rowValue = pd.Series([companies3[index], paraText])
+        paraText = paraText.strip()
+        rowValue = pd.Series([companies3[index], paraText, len(paraText), paraText.count(' ')])
         df = df.append(rowValue, ignore_index=True)
 
 #rename columns
-df.columns = ["Company", "ParagraphText"]
-
-#strip whitespace
-df["ParagraphText"] = df["ParagraphText"].str.strip()
+df.columns = ["Company", "ParagraphText", "ParagraphLength", "SpacesCount"]
 
 #print to csv
 #df.to_csv("TermsOfService.csv", index=False)
