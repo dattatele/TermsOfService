@@ -75,5 +75,11 @@ for url in urls3:
 #rename columns
 df.columns = ["Company", "ParagraphText", "ParagraphLength", "SpacesCount"]
 
+#remove blank rows
+
+#calculate porportion of where a paragraph is located within the terms of service
+#im thinking you would just use the order in the dataframe (i.e. if its the first
+#paragraph related to Facebook, then the value would be 1/(nrow(Facebook))) or something
+
 #print to csv
 #df.to_csv("TermsOfService.csv", index=False)
