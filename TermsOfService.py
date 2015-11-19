@@ -115,4 +115,4 @@ for x in range(0, df.shape[0]):
     df["ParaLocation"][x] = df["ParaLocation"][x] / companyTotalPara
 
 #print to csv
-#df.to_csv("TermsOfService.csv", index=False)
+df.to_csv("TermsOfService.csv", index=False)
