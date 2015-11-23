@@ -23,7 +23,7 @@ urls3 = ["https://www.netflix.com/TermsOfUse", "https://www.facebook.com/legal/t
          "https://www.youtube.com/t/terms"]
 
 #corresponding companies          
-companies = ["Yahoo", "Google", "GitHub", "Wikipedia", "Amazon", "SoundCloud", "Twiter", "Cloudant"]
+companies = ["Yahoo", "Google", "GitHub", "Wikipedia", "Amazon", "SoundCloud", "Twitter", "Cloudant"]
 
 companies2 = ["Instagram"]
 
