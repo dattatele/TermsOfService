@@ -12,7 +12,10 @@ import urllib
 #locations of terms of service
 urls = ["http://policies.yahoo.com/us/en/yahoo/terms/utos/index.htm", "https://www.google.com/intl/en/policies/terms/",
         "https://help.github.com/articles/github-terms-of-service/",
-        "https://wikimediafoundation.org/wiki/Terms_of_Use", "http://www.amazon.com/gp/help/customer/display.html/?ie=UTF8&nodeId=508088"]
+        "https://wikimediafoundation.org/wiki/Terms_of_Use", "http://www.amazon.com/gp/help/customer/display.html/?ie=UTF8&nodeId=508088",
+        "https://pages.soundcloud.com/en/legal/terms-of-use.html",
+        "https://twitter.com/tos?lang=en",
+        "https://cloudant.com/terms/"]
 
 urls2 = ["https://help.instagram.com/478745558852511"]
 
@@ -20,7 +23,7 @@ urls3 = ["https://www.netflix.com/TermsOfUse", "https://www.facebook.com/legal/t
          "https://www.youtube.com/t/terms"]
 
 #corresponding companies          
-companies = ["Yahoo", "Google", "GitHub", "Wikipedia", "Amazon"]
+companies = ["Yahoo", "Google", "GitHub", "Wikipedia", "Amazon", "SoundCloud", "Twiter", "Cloudant"]
 
 companies2 = ["Instagram"]
 
