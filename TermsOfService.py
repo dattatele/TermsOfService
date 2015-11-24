@@ -8,6 +8,7 @@ Created on Tue Nov 10 10:33:02 2015
 import pandas as pd
 from bs4 import BeautifulSoup
 import urllib
+import re # only for use of regex flags in pandas str methods
 
 #locations of terms of service
 urls = ["http://policies.yahoo.com/us/en/yahoo/terms/utos/index.htm", "https://www.google.com/intl/en/policies/terms/",
@@ -91,7 +92,7 @@ df["CapToLegthRatio"] = df["CapsCount"] / df["ParagraphLength"]
 
 #calculate location of each paragraph in the terms of service
 #first calculate total paragraphs by company
-totalParaByCompany = pd.DataFrame(df.groupby(by=df["Company"]).size())
+totalParaByCompany = pd.DataFrame(df.groupby(by=df["Company"]).size())[0] # take first column
 
 #get the index of the first occurrence of each company
 companies = companies + companies2 + companies3 #put companies all in one vector
@@ -103,19 +104,41 @@ for company in companies:
 df["ParaLocation"] = None
 for x in range(0, df.shape[0]):
     if x == 0:
-        df["ParaLocation"][x] = 1
+        df.loc[x,"ParaLocation"] = 0 # Made this 0 to mark the position of the beginning (rather than end) of the 
+                                     # paragraph in the document.  Also changed to .loc reference to assign to a 
+                                     # df view rather than a copy (error messages were showing up in Ipython)
 
     elif df["Company"][x] == df["Company"][x-1]:
-        df["ParaLocation"][x] = df["ParaLocation"][x-1] + 1
+        df.loc[x,"ParaLocation"] = df["ParaLocation"][x-1] + 1 # .loc reference for assignment- see above comment
         
     else:
-        df["ParaLocation"][x] = 1
+        df.loc[x,"ParaLocation"] = 0 # Ditto the comment on the if block
 
 #calculate order/total paragraphs
 for x in range(0, df.shape[0]):
     company = df["Company"][x]
-    companyTotalPara = int(str(totalParaByCompany.loc[company]).split()[1]) #grabs total paragraphs from groupby results
-    df["ParaLocation"][x] = df["ParaLocation"][x] / companyTotalPara
+    #companyTotalPara = int(str(totalParaByCompany.loc[company]).split()[1]) #grabs total paragraphs from groupby results
+    companyTotalPara = totalParaByCompany[company] # this works too
+    df.loc[x,"ParaLocation"] = df["ParaLocation"][x] / companyTotalPara # .loc reference for assignment
+    
+    
+# 0-1 flags for presence of special keywords
+df['Arbitration'] = (df.ParagraphText.str.contains('arbitration', flags=re.IGNORECASE)).astype('int8')
+df['ThirdParty'] = (df.ParagraphText.str.contains('third[- ]party', flags=re.IGNORECASE)).astype('int8')
+df['Waiver'] = (df.ParagraphText.str.contains('waiver', flags=re.IGNORECASE)).astype('int8')
+
+
+# Some more paragraph stats
+df['ParagraphWords'] = (df.ParagraphText.str.count(' ')) + 1 # a space was the best indicator of actual words I could find 
+                                                             # without inserting a great deal of complication.
+df['ParagraphSentences'] = (df.ParagraphText.str.count(r'\.[ $]')) # period followed by space or end-of-string
+df['Quotes'] = df.ParagraphText.str.count(r'["]')
+df['Parentheses'] = df.ParagraphText.str.count(r'[)(]')
+df['AvgWordLength'] = (df.ParagraphLength - (df.ParagraphWords - 1) - df.ParagraphSentences - df.Quotes - 
+                       df.Parentheses)/df.ParagraphWords
+#  (total chars - #spaces - #periods - #quotechars - #parentheses)/#words
+# not exact, but a good approximation.
+
 
 #print to csv
 df.to_csv("TermsOfService.csv", index=False)
