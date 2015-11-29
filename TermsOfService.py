@@ -133,7 +133,7 @@ df['ParagraphWords'] = (df.ParagraphText.str.count(' ')) + 1 # a space was the b
                                                              # without inserting a great deal of complication.
 df['ParagraphSentences'] = (df.ParagraphText.str.count(r'\.[ $]')) # period followed by space or end-of-string
 df['Quotes'] = df.ParagraphText.str.count(r'["]')
-df['Parentheses'] = df.ParagraphText.str.count(r'[)(]')
+df['Parentheses'] = df.ParagraphText.str.count(r'[)(]') - 2*df.ParagraphText.str.count(r'\([a-zA-Z0-9]\)')
 df['AvgWordLength'] = (df.ParagraphLength - (df.ParagraphWords - 1) - df.ParagraphSentences - df.Quotes - 
                        df.Parentheses)/df.ParagraphWords
 #  (total chars - #spaces - #periods - #quotechars - #parentheses)/#words
