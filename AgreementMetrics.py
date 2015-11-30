@@ -47,7 +47,7 @@ print(annotations)
 print(companies)
 
 
-# In[10]:
+# In[6]:
 
 # Define the assignments
 assignments = {annotations[0]:tuple(companies[[2,3,4,8,10,12]]),
@@ -57,7 +57,7 @@ assignments = {annotations[0]:tuple(companies[[2,3,4,8,10,12]]),
 print(assignments)
 
 
-# In[11]:
+# In[7]:
 
 # Inspect null values
 nulls = {}
@@ -72,7 +72,7 @@ for name in list(nulls.keys()):
     print(df.loc[indices, ['Company'] + list(nulls.keys())])
 
 
-# In[12]:
+# In[8]:
 
 # Reassign nulls to values in neighboring annotation columns
 for name in list(nulls.keys()):
@@ -82,7 +82,7 @@ for name in list(nulls.keys()):
     print(df.loc[indices, ['Company'] + list(nulls.keys())])
 
 
-# In[98]:
+# In[9]:
 
 # Initialize agreement metric matrices
 nrows = len(assignments)*(len(assignments) - 1)/2
@@ -92,7 +92,7 @@ metrics = pd.DataFrame({"sampleSize":np.NaN, "VI":np.NaN, "cohen":np.NaN, "compa
 print(metrics)
 
 
-# In[99]:
+# In[10]:
 
 # Compute the agreement metrics and put in a dataframe
 max_variation = np.log(4)
@@ -131,7 +131,7 @@ for i in range(0,(len(assignments)-1)):
 print(metrics)
 
 
-# In[167]:
+# In[11]:
 
 # Create the final response column(s)
 df['responseAND'] = np.array(np.int(), dtype = 'int8')
@@ -143,7 +143,7 @@ for i in range(0,df.shape[0]):
     df.loc[i,"responseOR"] = np.max(df.ix[i][list(assignments.keys())].dropna().values)
 
 
-# In[168]:
+# In[12]:
 
 # Write data to csv
 df.to_csv("TermsOfService.csv", index=False)
