@@ -1,0 +1,7 @@
+rater1,rater2,VI,cohen,companies,sampleSize
+Import_JL,Import_HM,0.5922764556367326,0.639514731369151,"{'Twitter', 'GitHub'}",104.0
+Import_JL,Import_MH,0.24356831361594886,0.8049340218014919,"{'SoundCloud', 'Cloudant'}",204.0
+Import_JL,Import_KS,0.38961606706719926,0.7093311312964491,"{'Instagram', 'Amazon'}",88.0
+Import_HM,Import_MH,0.5980925303733701,0.49245939675174005,"{'Google', 'Facebook'}",140.0
+Import_HM,Import_KS,0.3605721171253301,0.7036996971008223,"{'Yahoo', 'iCloud'}",249.0
+Import_MH,Import_KS,0.47567076263548036,0.48259642521166507,"{'Netflix', 'Youtube'}",150.0
