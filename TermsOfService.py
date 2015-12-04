@@ -16,7 +16,7 @@ urls = ["http://policies.yahoo.com/us/en/yahoo/terms/utos/index.htm", "https://w
         "https://wikimediafoundation.org/wiki/Terms_of_Use", "http://www.amazon.com/gp/help/customer/display.html/?ie=UTF8&nodeId=508088",
         "https://pages.soundcloud.com/en/legal/terms-of-use.html",
         "https://twitter.com/tos?lang=en",
-        "https://cloudant.com/terms/"]
+        "https://cloudant.com/terms/", "http://www.apple.com/legal/internet-services/icloud/en/terms.html"]
 
 urls2 = ["https://help.instagram.com/478745558852511"]
 
@@ -24,7 +24,7 @@ urls3 = ["https://www.netflix.com/TermsOfUse", "https://www.facebook.com/legal/t
          "https://www.youtube.com/t/terms"]
 
 #corresponding companies          
-companies = ["Yahoo", "Google", "GitHub", "Wikipedia", "Amazon", "SoundCloud", "Twitter", "Cloudant"]
+companies = ["Yahoo", "Google", "GitHub", "Wikipedia", "Amazon", "SoundCloud", "Twitter", "Cloudant", "iCloud"]
 
 companies2 = ["Instagram"]
 
