@@ -7,7 +7,7 @@ shinyServer(function(input, output) {
   
   setwd('/Users/hopeemac/Documents/Code/GIT/TermsOfService')
   # terms <- read.csv('Data/TermsOfService_Agreement_Final.csv', stringsAsFactors = F)
-  terms <- read.csv('Data/Final.csv', stringsAsFactors = F)
+  terms <- read.csv('Data/Data_App_Testing.csv', stringsAsFactors = F)
   
   
   comp <- unique(terms$Company)
