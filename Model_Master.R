@@ -153,7 +153,7 @@ testErrors <- apply(company.list.sample, 1, function(companies){
     glm.modelLDA <- glm(modelFormulaLDA, data = train.set)
     
     # Tune threshold
-    threshold = 
+    #threshold = 
     
     # Prediction
     probs <- predictGLMToS(glm.model,test.set)
@@ -185,84 +185,86 @@ rownames(testErrors) = apply(company.list.sample, 1, function(companies) paste0(
 testErrors
 
 write.csv(testErrors, "Data/CompanyTestErrors.csv")
-
 testErrors
-
-
+responsesLDA
+saveRDS()
 
 ##############
 # Run models for each rater
-response.vars = 
-
-
-# First set up company list
-companies <- unique(ToS$Company)
-# every k-tuplet of companies as a row in a matrix
-company.list <- t(combn(companies, k))
-# random sample of n rows
-company.list.sample <- sample(1:nrow(company.list), n)
-company.list.sample <- matrix(company.list[company.list.sample,], nrow = n)
+response.vars <- names(ToS)[str_detect(names(ToS), 'Import')]
+response.vars
 
 predictions <- list()
 predictionsLDA <- list()
 responses <- list()
 responsesLDA <- list()
 
-# For every row in the matrix, generate all test error metrics
-testErrors <- apply(company.list.sample, 1, function(companies){
-    #testErrorToS(probs= runif(nrow(ToS)),ToS$responseAND,0.7)
-    test.indices = which(ToS$Company %in% companies)
+raterTestErrors <- list()
+
+# For every response variable, subset and train on each company
+for(response.var in response.vars){
+    rater.indices = which(!is.na(ToS[[response.var]]))
+    # ToS.subset = ToS[!is.na(ToS[[response.var]]), ]
+    companies = unique(ToS$Company[rater.indices])
     
-    # Split
-    train.set <- ToS[-test.indices,]
-    test.set <- ToS[test.indices,]
-    
-    # Train LDA
-    topic.model <- genTopicModelToS(DTM[-test.indices,])
-    predDocTopic <- predictLDAToS(topic.model, DTM[test.indices,])
-    
-    # Combine Data Sources
-    train.set <- cbind(train.set,topic.model@gamma)
-    test.set <- cbind(test.set,predDocTopic)
-    
-    # Modelling
-    modelFormula <- as.formula(paste0(response.var,' ~ `', paste0(regressors,collapse = '` + `'), '`'))
-    modelFormulaLDA <- as.formula(paste0(response.var,' ~ `', 
-                                         paste0(c(regressors,colnames(predDocTopic)),collapse = '` + `'), '`'))
-    glm.model <- glm(modelFormula, data = train.set)
-    glm.modelLDA <- glm(modelFormulaLDA, data = train.set)
-    
-    # Tune threshold
-    threshold = 
+    for(company in companies){
+        test.indices = intersect(which(ToS$Company == company), rater.indices)
+        train.indices = setdiff(rater.indices,test.indices)
+        # Split
+        train.set <- ToS[train.indices,]
+        test.set <- ToS[test.indices,]
+        
+        # Train LDA
+        topic.model <- genTopicModelToS(DTM[train.indices,])
+        predDocTopic <- predictLDAToS(topic.model, DTM[test.indices,])
+        
+        # Combine Data Sources
+        train.set <- cbind(train.set,topic.model@gamma)
+        test.set <- cbind(test.set,predDocTopic)
+        
+        # Modelling
+        modelFormula <- as.formula(paste0(response.var,' ~ `', paste0(regressors,collapse = '` + `'), '`'))
+        modelFormulaLDA <- as.formula(paste0(response.var,' ~ `', 
+                                             paste0(c(regressors,colnames(predDocTopic)),collapse = '` + `'), '`'))
+        glm.model <- glm(modelFormula, data = train.set)
+        glm.modelLDA <- glm(modelFormulaLDA, data = train.set)
         
         # Prediction
         probs <- predictGLMToS(glm.model,test.set)
-    probsLDA <- predictGLMToS(glm.modelLDA,test.set)
-    
-    # test Error
-    testError <- testErrorToS(probs,test.set[[response.var]],0.3)
-    testErrorLDA <- testErrorToS(probsLDA,test.set[[response.var]],0.3)
-    
-    plot.roc(roc(predictor = probs, response = test.set[[response.var]]))
-    
-    names(testErrorLDA) = paste0(names(testErrorLDA),"LDA")
-    
-    company.names = paste0(companies, collapse = ".")
-    predictions[[company.names]] = probs
-    predictionsLDA[[company.names]] = probsLDA
-    
-    responses[[company.names]] = response
-    responsesLDA[[company.names]] = responsesLDA
-    
-    print(companies)
-    print(c(testError, testErrorLDA))
-    c(testError, testErrorLDA)
-})
+        probsLDA <- predictGLMToS(glm.modelLDA,test.set)
+        
+        # test Error
+        testError <- testErrorToS(probs,test.set[[response.var]],0.3)
+        testErrorLDA <- testErrorToS(probsLDA,test.set[[response.var]],0.3)
+        
+        plot.roc(roc(predictor = probs, response = test.set[[response.var]]))
+        
+        names(testErrorLDA) = paste0(names(testErrorLDA),"LDA")
+        
+        predictions[[company]] = probs
+        predictionsLDA[[company]] = probsLDA
+        
+        responses[[company]] = response
+        responsesLDA[[company]] = responsesLDA
+        
+        raterTestErrors[[paste0(response.var,'.',company)]] = c(testError, testErrorLDA)
+        print(raterTestErrors[[paste0(response.var,'.',company)]])
+        }
+}
+
+
+# raterRowNames <-sapply(response.vars, function(response.var){
+#     rater.indices = which(!is.na(ToS[[response.var]]))
+#     # ToS.subset = ToS[!is.na(ToS[[response.var]]), ]
+#     companies = unique(ToS$Company[rater.indices])
+#     paste0(response.var,'.',companies)
+# })
+# 
+# raterRowNames <- as.vector(raterRowNames)
 
 # then make them a dataframe for analysis
-testErrors <- data.frame(t(testErrors))
+raterTestErrors <- t(data.frame((raterTestErrors)))
+dim(raterTestErrors)
+raterTestErrors
 
-################
-rownames(testErrors) = apply(company.list.sample, 1, function(companies) paste0(companies, collapse = "."))
-
-testErrors
+write.csv(raterTestErrors, "Data/RaterTestErrors.csv", row.names = TRUE)
