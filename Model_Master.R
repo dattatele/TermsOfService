@@ -113,7 +113,8 @@ testErrorToS <- function(probs,response,threshold) {
 # Run Series/Loop
 
 # k companies at a time for testing, n train/test cycles
-k = 1;  n = 12
+k = 1;  n = 66
+response.var = "responseOR"
 
 # First set up company list
 companies <- unique(ToS$Company)
@@ -130,6 +131,8 @@ responsesLDA <- list()
 
 # For every row in the matrix, generate all test error metrics
 testErrors <- apply(company.list.sample, 1, function(companies){
+    # rowname
+    company.names = paste0(companies, collapse = ".")
     #testErrorToS(probs= runif(nrow(ToS)),ToS$responseAND,0.7)
     test.indices = which(ToS$Company %in% companies)
     
@@ -163,31 +166,34 @@ testErrors <- apply(company.list.sample, 1, function(companies){
     testError <- testErrorToS(probs,test.set[[response.var]],0.3)
     testErrorLDA <- testErrorToS(probsLDA,test.set[[response.var]],0.3)
     
-    plot.roc(roc(predictor = probs, response = test.set[[response.var]]))
+    AUC <- plot.roc(roc(predictor = probs, response = test.set[[response.var]]))
+    AUC <- AUC$auc
+    class(AUC) ="numeric"
+    names(AUC) = "AUC"
     
     names(testErrorLDA) = paste0(names(testErrorLDA),"LDA")
     
     company.names = paste0(companies, collapse = ".")
     predictions[[company.names]] = probs
     predictionsLDA[[company.names]] = probsLDA
-    
-    responses[[company.names]] = response
-    responsesLDA[[company.names]] = responsesLDA
+    responses[[company.names]] = test.set[[response.var]]
     
     print(companies)
-    print(c(testError, testErrorLDA))
-    c(testError, testErrorLDA)
+    print(c(testError, testErrorLDA, AUC))
+    c(testError, testErrorLDA, AUC)
 })
 
+#################
 # then make them a dataframe for analysis
-testErrors <- data.frame(t(testErrors))
-rownames(testErrors) = apply(company.list.sample, 1, function(companies) paste0(companies, collapse = "."))
-testErrors
+dim(testErrors)
+testErrors2 <- data.frame(t(testErrors))
+rownames(testErrors2) = apply(company.list.sample, 1, function(companies) paste0(companies, collapse = "."))
+testErrors2
 
-write.csv(testErrors, "Data/CompanyTestErrors.csv")
+write.csv(testErrors2, "Data/CompanyTestErrors2.csv")
 testErrors
-responsesLDA
-saveRDS()
+length(predictions)
+saveRDS(testErrors2,file = "Data/testErrors2.rds")
 
 ##############
 # Run models for each rater
@@ -252,19 +258,39 @@ for(response.var in response.vars){
         }
 }
 
-
-# raterRowNames <-sapply(response.vars, function(response.var){
-#     rater.indices = which(!is.na(ToS[[response.var]]))
-#     # ToS.subset = ToS[!is.na(ToS[[response.var]]), ]
-#     companies = unique(ToS$Company[rater.indices])
-#     paste0(response.var,'.',companies)
-# })
-# 
-# raterRowNames <- as.vector(raterRowNames)
-
-# then make them a dataframe for analysis
 raterTestErrors <- t(data.frame((raterTestErrors)))
 dim(raterTestErrors)
 raterTestErrors
 
 write.csv(raterTestErrors, "Data/RaterTestErrors.csv", row.names = TRUE)
+
+
+###########
+# summaries
+
+par(mar = c(2,2,3,2))
+par(mfrow = c(2,2))
+hist(testErrors2$recall, main = paste0("Recall using only extracted features\nMean = ",
+                                       round(mean(testErrors2$recall, na.rm = T),2)),
+     xlim = c(0,1), breaks = 10)
+hist(testErrors2$recallLDA, main = paste0("Recall using extracted features & LDA\nMean = ",
+                                          round(mean(testErrors2$recallLDA, na.rm = T),2)),
+     xlim = c(0,1), breaks = 10)
+hist(testErrors2$F1, main = paste0("F1 score using only extracted features\nMean = ",
+                                   round(mean(testErrors2$F1, na.rm = T),2)),
+     xlim = c(0,1), breaks = 10)
+hist(testErrors2$F1LDA, main = paste0("F1 Score using extracted features & LDA\nMean = ",
+                                      round(mean(testErrors2$F1LDA, na.rm = T),2)),
+     xlim = c(0,1), breaks = 10)
+hist(testErrors2$precision, main = paste0("Precision using only extracted features\nMean = ",
+                                   round(mean(testErrors2$precision, na.rm = T),2)),
+     xlim = c(0,1), breaks = 10)
+hist(testErrors2$precisionLDA, main = paste0("Precision using extracted features & LDA\nMean = ",
+                                      round(mean(testErrors2$precisionLDA, na.rm = T),2)),
+     xlim = c(0,1), breaks = 10)
+hist(testErrors2$accuracy, main = paste0("Accuracy using only extracted features\nMean = ",
+                                          round(mean(testErrors2$accuracy, na.rm = T),2)),
+     xlim = c(0,1), breaks = 10)
+hist(testErrors2$accuracyLDA, main = paste0("Accuracy using extracted features & LDA\nMean = ",
+                                             round(mean(testErrors2$accuracyLDA, na.rm = T),2)),
+     xlim = c(0,1), breaks = 10)
